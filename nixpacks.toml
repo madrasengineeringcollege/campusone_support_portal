@@ -1,0 +1,16 @@
+[phases.setup]
+nixPkgs = ["nginx"]
+
+[phases.build]
+cmds = ["echo 'Static site - no build needed'"]
+
+[start]
+cmd = "nginx -c /etc/nginx/nginx.conf -g 'daemon off;'"
+
+[phases.install]
+cmds = [
+  "mkdir -p /usr/share/nginx/html",
+  "cp -r . /usr/share/nginx/html/",
+  "mkdir -p /etc/nginx",
+  "cat > /etc/nginx/nginx.conf << 'NGINX'\nevents { worker_connections 1024; }\nhttp {\n  include /etc/nginx/mime.types;\n  default_type application/octet-stream;\n  sendfile on;\n  gzip on;\n  gzip_types text/plain text/css application/javascript image/svg+xml;\n  server {\n    listen 3000;\n    root /usr/share/nginx/html;\n    index index.html;\n    error_page 404 /404.html;\n    location ~* \\.(css|js|png|jpg|jpeg|gif|ico|svg|woff2?)$ {\n      expires 30d;\n      add_header Cache-Control \"public, immutable\";\n    }\n  }\n}\nNGINX"
+]
