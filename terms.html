@@ -206,5 +206,24 @@
   </footer>
 
   <script src="assets/js/main.js"></script>
+  <script>
+    // Dynamic content: fetch latest from API, fallback to hardcoded content
+    (function() {
+      var container = document.querySelector('.legal-page');
+      if (!container) return;
+      var backLink = container.querySelector('.back-link');
+      fetch('https://campusoneapi.madrascollege.ac.in/api/v1/app/content?type=terms', {
+        headers: { 'X-App-Key': 'web-support-portal' }
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.success && data.data && data.data.content) {
+            var backHtml = backLink ? backLink.outerHTML : '';
+            container.innerHTML = backHtml + data.data.content;
+          }
+        })
+        .catch(function() { /* Silently fail — hardcoded content stays */ });
+    })();
+  </script>
 </body>
 </html>
